@@ -101,7 +101,7 @@ def main():
   # 新規に追加されたものを取得
   new_plans = [item[2:] for item in diff if item.startswith('+')]
 
-  if len(new_plans) > 0:
+  if len(new_plans) >= 0:
     LINE_message("ご希望のプランが追加されました")
 
   with open('./lastData.txt', "w") as f:

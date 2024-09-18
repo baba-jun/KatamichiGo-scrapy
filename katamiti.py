@@ -77,6 +77,8 @@ def main():
         if start_shop_item:
           shops.append(((start_shop[1].text).replace('\n', ''), (return_shop[1].text).replace('\n', ''), (car_type[1].text).replace('\n', '')))
 
+  print(shops)
+
   # 利用したいプランを取得
   for shop in shops:
     if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):

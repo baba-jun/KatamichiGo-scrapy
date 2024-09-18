@@ -101,8 +101,8 @@ def main():
   # 新規に追加されたものを取得
   new_plans = [item[2:] for item in diff if item.startswith('+')]
 
-  if len(new_plans) >= 0:
-    LINE_message("ご希望のプランが追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+  if len(new_plans) > 0:
+    LINE_message("\nご希望のプランが追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
   with open('./lastData.txt', "w") as f:
     for item in new_plans:

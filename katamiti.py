@@ -55,8 +55,8 @@ def main():
   # li要素をリスト形式で取得
   li_elements = ul_element.find_all("li")
 
-  required_start_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉", "宮城"]
-  required_return_shops = ["大阪", "兵庫", "京都", "滋賀", "青森"]
+  required_start_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉"]
+  required_return_shops = ["大阪", "兵庫", "京都", "滋賀"]
 
   # 全プラン
   shops = []

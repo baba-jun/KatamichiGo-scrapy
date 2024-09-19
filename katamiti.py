@@ -63,6 +63,9 @@ def main():
 
   # 利用したいプラン
   get_required_plan = []
+  
+  # 新規追加されたプラン
+  new_plans = []
 
   # 全プランを取得
   if li_elements:
@@ -77,39 +80,43 @@ def main():
         if start_shop_item:
           shops.append(((start_shop[1].text).replace('\n', ''), (return_shop[1].text).replace('\n', ''), (car_type[1].text).replace('\n', '')))
 
-  print(shops)
-
   # 利用したいプランを取得
   for shop in shops:
     if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
       get_required_plan.append(shop)
 
-  # 最新版のファイルを開く
-  last_file = open('./lastData.txt', 'r')
+  # 利用したいプランがあれば処理を続行
+  if len(get_required_plan) > 0:
+    # 最新版のファイルを開く
+    last_file = open('./lastData.txt', 'r')
+    # ファイルの中身を文字列型で取得
+    last_required_plan_string = last_file.read().strip()
+    last_file.close()
 
-  last_required_plan_string = last_file.read()
+    # 取得したプランを文字列型に変換（プランごとに改行）
+    get_required_plan_letters = [''.join(tpl) for tpl in get_required_plan]
+    get_required_plan_string = '\n'.join(get_required_plan_letters) + '\n'
 
-  last_file.close()
+    # 前回取得分との差分情報を取得
+    # それぞれの文字列を単語ごとに分割してリスト型にする
+    diff = difflib.ndiff(last_required_plan_string.split(), get_required_plan_string.split())
 
-  # 取得したプランをカンマで連結して文字列に変換
-  get_required_plan_letters = [''.join(tpl) for tpl in get_required_plan]
-  get_required_plan_string = ','.join(get_required_plan_letters)
+    # 新規に追加されたものを取得
+    for item in diff:
+      if item.startswith('+'):
+        new_plans.append(item[2:])
 
-  # 前回取得分との差分情報を取得
-  diff = difflib.ndiff(last_required_plan_string.split(','), get_required_plan_string.split(','))
+    # 新規追加されたプランがあればLINEに通知
+    if len(new_plans) > 0:
+      LINE_message("\nご希望のプランが追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
-  # 新規に追加されたものを取得
-  new_plans = [item[2:] for item in diff if item.startswith('+')]
+    # 最新版のファイルを更新
+    with open('./lastData.txt', "w") as f:
+      for item in new_plans:
+        f.write(item + '\n')
+    f.close()
 
-  if len(new_plans) > 0:
-    LINE_message("\nご希望のプランが追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
-
-  with open('./lastData.txt', "w") as f:
-    for item in new_plans:
-      f.write(item + ',')
-  f.close()
-
-  driver.quit()
+    driver.quit()
 
 if __name__ == "__main__":
     main()

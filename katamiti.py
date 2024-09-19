@@ -85,6 +85,9 @@ def main():
     if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
       get_required_plan.append(shop)
 
+  print(shops + '\n')
+  print(get_required_plan + '\n')
+
   # 利用したいプランがあれば処理を続行
   if len(get_required_plan) > 0:
     # 最新版のファイルを開く

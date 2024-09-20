@@ -93,6 +93,8 @@ def main():
     last_file = open('./lastData.txt', 'r')
     # ファイルの中身を文字列型で取得
     last_required_plan_string = last_file.read().strip()
+    print(last_required_plan_string)
+    print("\n")
     last_file.close()
 
     # 取得したプランを文字列型に変換（プランごとに改行）

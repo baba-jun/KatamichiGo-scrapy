@@ -87,6 +87,10 @@ def main():
 
   print(get_required_plan)
 
+  print("\n")
+
+  print(shops)
+
   # 利用したいプランがあれば処理を続行
   if len(get_required_plan) > 0:
     # 最新版のファイルを開く

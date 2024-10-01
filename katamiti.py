@@ -32,6 +32,13 @@ def LINE_message(msg):
   r = requests.post(url, headers = headers, params=payload)
 
 def main():
+  # 希望の出発店舗、返却店舗
+  required_start_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉"]
+  required_return_shops = ["大阪", "兵庫", "京都", "滋賀"]
+
+  # ブラウザを起動
+  html = driver.page_source
+  soup = BeautifulSoup(html, "html.parser")
 
   options = webdriver.ChromeOptions()
   options.add_argument('--headless')
@@ -47,24 +54,18 @@ def main():
   time.sleep(5)
 
 
-  html = driver.page_source
-  soup = BeautifulSoup(html, "html.parser")
-
   ul_element = soup.find("ul", class_="service-items__body is-init is-show")
 
-  # li要素をリスト形式で取得
+  # li要素をリスト形式で取得（li要素に各プランのコンテンツがある）
   li_elements = ul_element.find_all("li")
 
-  required_start_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉"]
-  required_return_shops = ["大阪", "兵庫", "京都", "滋賀"]
-
-  # 全プラン
+  # 取得した全てのプラン
   shops = []
 
-  # 利用したいプラン
+  # 取得したプランのうち、利用したいプラン
   get_required_plan = []
 
-  # 新規追加されたプラン
+  # 取得したプランでかつ利用したいプランのうち、前回から追加されたプラン
   new_plans = []
 
   # 全プランを取得
@@ -80,51 +81,51 @@ def main():
         if start_shop_item:
           shops.append(((start_shop[1].text).replace('\n', ''), (return_shop[1].text).replace('\n', ''), (car_type[1].text).replace('\n', '')))
 
-  # 利用したいプランを取得
-  for shop in shops:
-    if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
-      get_required_plan.append(shop)
+  # ./getData.txtに取得したいプランを書き込む（プランごとに改行）
+  with open('./getData.txt', "w") as f:
+    # 利用したいプランを取得
+    for shop in shops:
+      if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
+        get_required_plan.append(shop)
+        f.write(shop[0] + ' ' + shop[1] + ' ' + shop[2] + '\n')
 
-  print(get_required_plan)
+  # 今回取得したプランのうち、利用したいものをファイルから取得
+  with open('./getData.txt', "r") as f:
+    getData = str(f.read())
+  f.close()
+
+  # 前回取得したプランのうち、利用したいものをファイルから取得
+  with open('./lastData.txt', "r") as f:
+    lastData = str(f.read())
+  f.close()
+
+  print(getData)
 
   print("\n")
 
-  print(shops)
+  print(lastData)
+  
+  print("\n")
 
-  # 利用したいプランがあれば処理を続行
-  if len(get_required_plan) > 0:
-    # 最新版のファイルを開く
-    last_file = open('./lastData.txt', 'r')
-    # ファイルの中身を文字列型で取得
-    last_required_plan_string = last_file.read().strip()
-    print(last_required_plan_string)
-    print("\n")
-    last_file.close()
+  # 前回取得分との差分を取得
+  diff = difflib.ndiff(lastData.splitlines(), getData.splitlines())
 
-    # 取得したプランを文字列型に変換（プランごとに改行）
-    get_required_plan_letters = [''.join(tpl) for tpl in get_required_plan]
-    get_required_plan_string = '\n'.join(get_required_plan_letters) + '\n'
+  for d in diff:
+    if d[0] == '+':
+      new_plans.append(d[2:])
 
-    # 前回取得分との差分情報を取得
-    # それぞれの文字列を単語ごとに分割してリスト型にする
-    diff = difflib.ndiff(last_required_plan_string.split(), get_required_plan_string.split())
+  print(new_plans)
 
-    # 新規に追加されたものを取得
-    for item in diff:
-      if item.startswith('+'):
-        new_plans.append(item[2:])
+  # 新規追加されたプランがあればLINEに通知
+  if len(new_plans) > 0:
+    LINE_message("\nご希望のプランが" + len(lastData) +  "件追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
-    # 新規追加されたプランがあればLINEに通知
-    if len(new_plans) > 0:
-      LINE_message("\nご希望のプランが追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+  # 最新版のファイルを更新
+  with open('./lastData.txt', "w") as f:
+      f.write(getData)
+  f.close()
 
-    # 最新版のファイルを更新
-    with open('./lastData.txt', "w") as f:
-      for item in new_plans:
-        f.write(item + '\n')
-    f.close()
-
-    driver.quit()
+  driver.quit()
 
 if __name__ == "__main__":
     main()

@@ -46,13 +46,13 @@ def main():
   driver = webdriver.Chrome(options=options)
   url = "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma"
 
-  html = driver.page_source
-  soup = BeautifulSoup(html, "html.parser")
-
   driver.get(url)
 
   # 少し待つ
   time.sleep(5)
+
+  html = driver.page_source
+  soup = BeautifulSoup(html, "html.parser")
 
 
   ul_element = soup.find("ul", class_="service-items__body is-init is-show")

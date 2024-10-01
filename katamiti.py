@@ -12,6 +12,9 @@ import os
 # LINE アクセストークン
 token = os.environ.get("LINE_TOKEN")
 
+# Discord Webhook URL
+webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
+
 #LINEメッセージ送信の関数
 def LINE_message(msg):
   # APIエンドポイントのURLを定義
@@ -24,6 +27,15 @@ def LINE_message(msg):
   payload = {"message" :  message}
   # POSTリクエストの使用
   r = requests.post(url, headers = headers, params=payload)
+
+#Discordメッセージ送信の関数
+def Discord_message(msg):
+  # 送信するメッセージの設定
+  message =  (msg)
+  # ペイロードの設定
+  payload = {"content" :  message}
+  # POSTリクエストの使用
+  r = requests.post(webhook_url, params=payload)
 
 # S3にファイルをアップロードする関数
 def upload_file(file_name, bucket, object_name=None):
@@ -152,6 +164,9 @@ def main():
   # 新規追加されたプランがあればLINEに通知
   if len(new_plans) > 0:
     LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+    Discord_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+  
+  Discord_message("やぁ")
 
   # 最新版のファイルを更新
   with open('./lastData.txt', "w") as f:

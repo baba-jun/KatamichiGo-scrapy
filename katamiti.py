@@ -35,7 +35,7 @@ def Discord_message(msg):
   # ペイロードの設定
   payload = {"content" :  message}
   # POSTリクエストの使用
-  r = requests.post(webhook_url, params=payload)
+  requests.post(webhook_url, json=payload)
 
 # S3にファイルをアップロードする関数
 def upload_file(file_name, bucket, object_name=None):
@@ -44,8 +44,8 @@ def upload_file(file_name, bucket, object_name=None):
 
     s3_client = boto3.client(
         's3',
-        aws_access_key_id=os.environ.get('aws_access_key_id'), #実際に取得したアクセスキーを入力する
-        aws_secret_access_key=os.environ.get('aws_secret_access_key'), #実際に取得したアクセスキーを入力する
+        aws_access_key_id=os.environ.get('aws_access_key_id'),
+        aws_secret_access_key=os.environ.get('aws_secret_access_key'),
     )
 
     try:
@@ -162,10 +162,10 @@ def main():
   print(new_plans)
 
   # 新規追加されたプランがあればLINEに通知
-  if len(new_plans) > 0:
+  if len(new_plans) > 0 or delete_plans > 0:
     LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
     Discord_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
-  
+
   Discord_message("やぁ")
 
   # 最新版のファイルを更新

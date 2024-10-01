@@ -119,7 +119,7 @@ def main():
 
   # 新規追加されたプランがあればLINEに通知
   if len(new_plans) > 0:
-    LINE_message("\nご希望のプランが" + len(lastData) +  "件追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+    LINE_message("\nご希望のプランが" + str(len(lastData)) +  "件追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
   # 最新版のファイルを更新
   with open('./lastData.txt', "w") as f:

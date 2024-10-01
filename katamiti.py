@@ -7,8 +7,11 @@ Original file is located at
     https://colab.research.google.com/drive/1MJ6glX6Kl7dzxUKWj028yT9-_sOYV-Ny
 """
 
+import logging
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+import boto3
+from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
 import time
 import difflib
@@ -30,6 +33,41 @@ def LINE_message(msg):
   payload = {"message" :  message}
   # POSTリクエストの使用
   r = requests.post(url, headers = headers, params=payload)
+
+# S3にファイルをアップロードする関数
+def upload_file(file_name, bucket, object_name=None):
+    if object_name is None:
+        object_name = file_name
+
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=os.environ.get('aws_access_key_id'), #実際に取得したアクセスキーを入力する
+        aws_secret_access_key=os.environ.get('aws_secret_access_key'), #実際に取得したアクセスキーを入力する
+    )
+
+    try:
+        response = s3_client.upload_file(file_name, bucket, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
+# S3からファイルをダウンロードする関数
+def download_file(file_name, bucket, object_name=None):
+    if object_name is None:
+        object_name = file_name
+
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=os.environ.get('aws_access_key_id'), #実際に取得したアクセスキーを入力する
+        aws_secret_access_key=os.environ.get('aws_secret_access_key'), #実際に取得したアクセスキーを入力する
+    )
+
+    try:
+        response = s3_client.download_file(bucket, object_name, file_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
 
 def main():
   # 希望の出発店舗、返却店舗
@@ -89,6 +127,7 @@ def main():
       if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
         get_required_plan.append(shop)
         f.write(shop[0] + ' ' + shop[1] + ' ' + shop[2] + '\n')
+  upload_file('./getData.txt', 'scrapy-diff', 'getData.txt')
 
   # 今回取得したプランのうち、利用したいものをファイルから取得
   with open('./getData.txt', "r") as f:
@@ -96,18 +135,16 @@ def main():
   f.close()
 
   # 前回取得したプランのうち、利用したいものをファイルから取得
+  download_file('./lastData.txt', 'scrapy-diff', 'lastData.txt')
   with open('./lastData.txt', "r") as f:
     lastData = str(f.read())
   f.close()
 
   print(getData)
 
-  print("\n")
 
   print(lastData)
   
-  print("\n")
-
   # 前回取得分との差分を取得
   diff = difflib.ndiff(lastData.splitlines(), getData.splitlines())
 
@@ -117,14 +154,15 @@ def main():
 
   print(new_plans)
 
-  # 新規追加されたプランがあればLINEに通知
-  if len(new_plans) > 0:
-    LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
+  # # 新規追加されたプランがあればLINEに通知
+  # if len(new_plans) > 0:
+  #   LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\nhttps://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
   # 最新版のファイルを更新
   with open('./lastData.txt', "w") as f:
       f.write(getData)
   f.close()
+  upload_file('./lastData.txt', 'scrapy-diff', 'lastData.txt')
 
   driver.quit()
 

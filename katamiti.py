@@ -37,8 +37,6 @@ def main():
   required_return_shops = ["大阪", "兵庫", "京都", "滋賀"]
 
   # ブラウザを起動
-  html = driver.page_source
-  soup = BeautifulSoup(html, "html.parser")
 
   options = webdriver.ChromeOptions()
   options.add_argument('--headless')
@@ -47,6 +45,9 @@ def main():
 
   driver = webdriver.Chrome(options=options)
   url = "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma"
+
+  html = driver.page_source
+  soup = BeautifulSoup(html, "html.parser")
 
   driver.get(url)
 

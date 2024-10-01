@@ -166,8 +166,6 @@ def main():
     LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
     Discord_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
-  Discord_message("やぁ")
-
   # 最新版のファイルを更新
   with open('./lastData.txt', "w") as f:
       f.write(getData)

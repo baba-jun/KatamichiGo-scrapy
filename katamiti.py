@@ -97,7 +97,7 @@ def main():
 
   # 取得したプランでかつ利用したいプランのうち、前回から追加されたプラン
   new_plans = []
-  
+
   # 削除されたプランの数
   delete_plans = 0
 
@@ -121,7 +121,6 @@ def main():
       if any(required_start_shop in shop[0] for required_start_shop in required_start_shops) and any(required_return_shop in shop[1] for required_return_shop in required_return_shops):
         get_required_plan.append(shop)
         f.write(shop[0] + ' ' + shop[1] + ' ' + shop[2] + '\n')
-  upload_file('./getData.txt', 'scrapy-diff', 'getData.txt')
 
   # 今回取得したプランのうち、利用したいものをファイルから取得
   with open('./getData.txt', "r") as f:
@@ -138,7 +137,7 @@ def main():
 
 
   print(lastData)
-  
+
   # 前回取得分との差分を取得
   diff = difflib.ndiff(lastData.splitlines(), getData.splitlines())
 

@@ -75,7 +75,7 @@ def download_file(file_name, bucket, object_name=None):
 def main():
   # 希望の出発店舗、返却店舗
   required_start_shops = ["大阪",	"兵庫", "京都", "滋賀"]
-	required_return_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉"]
+  required_return_shops = ["トヨタモビリティサービス", "神奈川", "東京", "千葉"]
   # ブラウザを起動
 
   options = webdriver.ChromeOptions()

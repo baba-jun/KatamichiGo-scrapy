@@ -1,32 +1,20 @@
+import difflib
 import logging
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import os
+import time
+
 import boto3
+import requests
 from botocore.exceptions import ClientError
 from bs4 import BeautifulSoup
-import time
-import difflib
-import requests
-import os
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 # LINE アクセストークン
 token = os.environ.get("LINE_TOKEN")
 
 # Discord Webhook URL
 webhook_url = os.environ.get("DISCORD_WEBHOOK_URL")
-
-#LINEメッセージ送信の関数
-def LINE_message(msg):
-  # APIエンドポイントのURLを定義
-  url = "https://notify-api.line.me/api/notify"
-  # HTTPリクエストヘッダーの設定
-  headers = {"Authorization" : "Bearer "+ token}
-  # 送信するメッセージの設定
-  message =  (msg)
-  # ペイロードの設定
-  payload = {"message" :  message}
-  # POSTリクエストの使用
-  r = requests.post(url, headers = headers, params=payload)
 
 #Discordメッセージ送信の関数
 def Discord_message(msg):
@@ -162,7 +150,6 @@ def main():
 
   # 新規追加されたプランがあればLINEに通知
   if len(new_plans) > 0 or delete_plans > 0:
-    LINE_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
     Discord_message("\nご希望のプランが" + str(len(new_plans)) +  "件追加されました\n " + str(delete_plans) + "件受付終了しました\n" "https://cp.toyota.jp/rentacar/?padid=ag270_fr_sptop_onewayma")
 
   # 最新版のファイルを更新
